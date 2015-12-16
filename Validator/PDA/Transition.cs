@@ -14,39 +14,47 @@ namespace ValidatorUtil.PDA
         public char[] Inputs { get; set; }
 
         public char? Input { get; set; }
-        public char StackSymbol { get; set; }
+        public char PopCharacter { get; set; }
 
+        public char PushCharacter { get; set; }
 
         public int StateIdOut { get; }
 
-        public Transition(char input, char stack, int stateIdOut = 0)
+        public bool IsEpsilonMove { get { return Input == EpsilonChar;  } }
+
+        public Transition(char input, char popChar, char pushChar = Transition.EpsilonChar, int stateIdOut = 0)
         {
             Input = input;
-            StackSymbol = stack;
+            PopCharacter = popChar;
             StateIdOut = stateIdOut;
+            PushCharacter = pushChar;
         }
 
-        public Transition(char[] inputs, char stack, int stateIdOut = 0)
+        public Transition(char[] inputs, char popChar, char pushChar = Transition.EpsilonChar,  int stateIdOut = 0)
         {
             Inputs = inputs;
-            StackSymbol = stack;
+            PopCharacter = popChar;
             StateIdOut = stateIdOut;
+            PushCharacter = pushChar;
         }
 
-        public int? IsIn(char inputChar)
+        public int? IsIn(char inputChar, char currentTopOfStackChar)
         {
-            if (Input.HasValue && Input.Value == inputChar)
+            if (PopCharacter == EpsilonChar || currentTopOfStackChar == PopCharacter)
             {
-                return StateIdOut;
-            }
-            else if (Inputs != null && Inputs.Length > 0)
-            {
-                if (Inputs.Contains(inputChar))
+                if ((Input.HasValue && (Input.Value == inputChar ||
+                     Input.Value == Transition.EpsilonChar)) || inputChar == Transition.EpsilonChar)
                 {
                     return StateIdOut;
                 }
+                else if (Inputs != null && Inputs.Length > 0)
+                {
+                    if (Inputs.Contains(inputChar))
+                    {
+                        return StateIdOut;
+                    }
+                }
             }
-
             return null;
         }
     }

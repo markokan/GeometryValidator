@@ -9,22 +9,14 @@ namespace ValidatorUtil.PDA
 {
     public class Pda
     {
-        public int Position { get; private set; }
         public char[] Input { get; private set; }
-
-        public StringBuilder Stack { get; private set; }
-
-        public bool IsEnd
-        {
-            get { return Input != null && Input.Length < Position + 1; }
-        }
-
+    
         public IEnumerable<State> States { get; set; }
 
         public bool Run(string input)
         {
             bool retVal = false;
-            Stack = new StringBuilder();
+            
 
             input = input + " ";
 
@@ -32,51 +24,98 @@ namespace ValidatorUtil.PDA
 
             var runningState = States.FirstOrDefault(c => c.IsStart);
 
-            while (runningState != null && IsEnd == false)
+            if (runningState != null)
             {
-                char inputChar = Input[Position];
-
-                foreach (var transition in runningState.Transitions)
-                {
-                    var nextStateId = transition.IsIn(inputChar);
-                    if (nextStateId != null)
-                    {
-                        runningState = States.FirstOrDefault(c => c.Id == nextStateId);
-
-                        switch (transition.StackSymbol)
-                        {
-                            case Transition.PopChar:
-                                if (Stack.Length > 0)
-                                {
-                                    Stack.Remove(Stack.Length - 1, 1);
-                                }
-                                else
-                                {
-                                    runningState = null;
-                                }
-                                break;
-                            case Transition.EpsilonChar:
-                                break;
-                            default:
-                                Stack.Append(transition.StackSymbol);
-                                break;
-                        };
-                        break;
-                    }
-                    else
-                    {
-                        runningState = null;
-                    }
-                }
-
-                Debug.WriteLine("InputChar={0}, State={1}, Stack={2}", inputChar, runningState != null ? runningState.Id : -1, Stack.ToString());
-
-                Position++;
+                retVal = LoopAll(runningState, new char[] { Transition.EpsilonChar, '0', '0', '0', '1', '1', '1' });
             }
-
-            retVal = String.IsNullOrEmpty(Stack.ToString()) && (runningState != null && runningState.IsAccept);
 
             return retVal;
         }
+
+        private bool LoopAll(State currentState, char[] input, StringBuilder stack = null, int position = 0)
+        {
+            if (stack == null) stack = new StringBuilder();
+            bool retVal = false;
+
+            char? inputChar = null;
+            char currentTopOfStack;
+
+            int transationPosition = 0;
+            Transition currentTransition = currentState.Transitions.ToList()[transationPosition];
+            int countOfTransitions = currentState.Transitions.Count();
+
+            while (input.Length >= position)
+            {
+                int? nextStateId = null;
+
+                inputChar = input[position];
+                position++;
+
+                currentTopOfStack = stack.Length == 0 ? Transition.EpsilonChar : stack[stack.Length - 1];
+
+                // Anna seuraava tila tai pysy tässä ja ota seuraava kirjain
+                nextStateId = currentTransition.IsIn(inputChar.Value, currentTopOfStack);
+
+                if (nextStateId == null)
+                {
+                    var epsilonMovement = currentState.Transitions.FirstOrDefault(c => c.IsEpsilonMove);
+                    if (epsilonMovement != null)
+                    {
+                        transationPosition = 0;
+                        currentState = States.FirstOrDefault(c => c.Id == epsilonMovement.StateIdOut);
+                        countOfTransitions = currentState.Transitions.Count();
+                        currentTransition = currentState.Transitions.ToList()[transationPosition];
+                        position--;
+                        continue;
+                    }
+                }
+
+                if (nextStateId != null)
+                {
+                    if (currentTransition.PopCharacter != Transition.EpsilonChar)
+                    {
+                        // Pop
+                        if (stack.Length > 0 && stack[stack.Length -1] == currentTransition.PopCharacter)
+                        {
+                            stack.Remove(stack.Length - 1, 1);
+                        }
+                        else
+                        {
+                            // Fail fast
+                            return false;
+                        }
+                    }
+
+                    if (currentTransition.PushCharacter != Transition.EpsilonChar)
+                    { 
+                        // Push
+                        stack.Append(currentTransition.PushCharacter);
+                    }
+
+                    Debug.WriteLine("InputChar={0}, State={1}, Stack={2}", inputChar.HasValue ? inputChar : '?'
+                        , currentState != null ? currentState.Id : -1, stack != null ? stack.ToString() : "");
+                }
+                else
+                {
+                    if (countOfTransitions >= transationPosition)
+                    {
+                        transationPosition++;
+                        currentTransition = currentState.Transitions.ToList()[transationPosition];
+                    }
+                }
+
+                if (nextStateId.HasValue && currentState.Id != nextStateId && countOfTransitions == 1)
+                {
+                    transationPosition = 0;
+                    currentState = States.FirstOrDefault(c => c.Id == nextStateId);
+                    countOfTransitions = currentState.Transitions.Count();
+                    currentTransition = currentState.Transitions.ToList()[transationPosition];
+                }
+            }
+
+            return false;
+        }
+
+       
     }
 }

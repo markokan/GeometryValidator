@@ -23,45 +23,45 @@ namespace ValidatorUtil
                {
                    Transitions = new List<Transition>
                    {
-                       new Transition(new []{ '0', '1','2','3','4','5','6','7','8','9'}, Transition.EpsilonChar, 0),
-                       new Transition('.', 'A', 1)
+                       new Transition(new []{ '0', '1','2','3','4','5','6','7','8','9'}, Transition.EpsilonChar, Transition.EpsilonChar, 0),
+                       new Transition('.', 'A', Transition.EpsilonChar, 1)
                    }
                },
                new State(1)
                {
                    Transitions = new List<Transition>
                    {
-                     new Transition(new []{ '0', '1','2','3','4','5','6','7','8','9'}, Transition.EpsilonChar, 1),
-                     new Transition(compareChar, 'B', 2)
+                     new Transition(new []{ '0', '1','2','3','4','5','6','7','8','9'}, Transition.EpsilonChar, Transition.EpsilonChar, 1),
+                     new Transition(compareChar, 'B', 'A', 2)
                    }
                },
                new State(2)
                {
                     Transitions = new List<Transition>
                     {
-                        new Transition(' ', Transition.EpsilonChar, 2),
-                        new Transition('\t', Transition.EpsilonChar, 2),
-                        new Transition('\n', Transition.EpsilonChar, 2),
-                        new Transition(new []{ '0', '1','2','3','4','5','6','7','8','9'}, Transition.EpsilonChar, 2),
-                        new Transition('.', Transition.PopChar, 3),
+                        new Transition(' ', Transition.EpsilonChar, Transition.EpsilonChar, 2),
+                        new Transition('\t', Transition.EpsilonChar, Transition.EpsilonChar, 2),
+                        new Transition('\n', Transition.EpsilonChar, Transition.EpsilonChar, 2),
+                        new Transition(new []{ '0', '1','2','3','4','5','6','7','8','9'}, Transition.EpsilonChar, Transition.EpsilonChar, 2),
+                        new Transition('.', Transition.PopChar, 'B', 3),
                     }
                },
                new State(3)
                {
                     Transitions = new List<Transition>
                     {
-                        new Transition(new []{ '0', '1','2','3','4','5','6','7','8','9'}, Transition.EpsilonChar, 3),
-                        new Transition(compareChar, Transition.PopChar, 4)
+                        new Transition(new []{ '0', '1','2','3','4','5','6','7','8','9'}, Transition.EpsilonChar, Transition.EpsilonChar, 3),
+                        new Transition(compareChar, Transition.PopChar, 'A', 4)
                     }
                },
                new State(4, false, true)
                {
                     Transitions = new List<Transition>
                     {
-                        new Transition(' ', Transition.EpsilonChar, 4),
-                        new Transition('\t', Transition.EpsilonChar, 4),
-                        new Transition('\n', Transition.EpsilonChar, 4),
-                        new Transition(new []{'0','1','2','3','4','5','6','7','8','9'}, Transition.EpsilonChar, 0)
+                        new Transition(' ', Transition.EpsilonChar, Transition.EpsilonChar, 4),
+                        new Transition('\t', Transition.EpsilonChar, Transition.EpsilonChar, 4),
+                        new Transition('\n', Transition.EpsilonChar, Transition.EpsilonChar, 4),
+                        new Transition(new []{'0','1','2','3','4','5','6','7','8','9'}, Transition.EpsilonChar, Transition.EpsilonChar, 0)
                     }
                }
             };
