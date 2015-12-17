@@ -41,13 +41,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseValidator.cs" />
+    <Compile Include="LineValidator.cs" />
     <Compile Include="ListType.cs" />
     <Compile Include="PDA\InvalidPdaException.cs" />
     <Compile Include="PDA\Pda.cs" />
     <Compile Include="PDA\State.cs" />
     <Compile Include="PDA\Transition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Validator.cs" />
+    <Compile Include="PolygonValidator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

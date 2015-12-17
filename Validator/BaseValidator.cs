@@ -3,16 +3,10 @@ using ValidatorUtil.PDA;
 
 namespace ValidatorUtil
 {
-    /// <summary>
-    /// Validates Polygon strings. Supported Coordinate and PosList.
-    /// Check is string correct format and polygon is closed.
-    /// </summary>
-    public static class PolygonStringValidator
+    public abstract class BaseValidator
     {
-        public static bool IsValid(string input, ListType typeOfList = ListType.PosList)
+        protected bool IsValid(string input, ListType typeOfList = ListType.PosList)
         {
-            bool retval = false;
-
             char compareChar = typeOfList == ListType.PosList ? ' ' : ',';
 
             // Tarkasta onko oikea määrä pareja ja sisältö oikein (PDA)
@@ -68,15 +62,9 @@ namespace ValidatorUtil
                }
             };
 
-            retval = pdaCheckPolygon.IsAcceptable(input);
-
-            // Tarkasta onko sama vika kuin eka (PDA)
-            if (retval)
-            {
-
-            }
-
-            return retval;
+            return pdaCheckPolygon.IsAcceptable(input);
         }
+
+        public abstract bool Validate(string input, ListType typeOfList = ListType.PosList);
     }
 }

@@ -8,10 +8,13 @@ namespace ValidatorTests
     public class ValidateTest
     {
         private string _goodPosListPolygon, _goodPoslitPolygon2, _badPosListPolygon2, _goodCoordinate1, _badCoordinate1;
+        private PolygonValidator _polygonValidator;
 
         [TestInitialize]
         public void InitTests()
         {
+            _polygonValidator = new PolygonValidator();
+
             _goodPosListPolygon = "552195.58089905 6932799.75180975 552195.128651859 6932799.98832659 552126.852809161 " +
                 "6932716.19843894 552113.441011408 6932699.73945017 552113.715168711 6932699.28495579 552119.007865341 " +
                 "6932690.51079848 552151.97584287 6932662.6063041 552158.591573207 6932657.0063041 552159.21573051 " +
@@ -57,7 +60,7 @@ namespace ValidatorTests
         {
             // Arrange
             // Act
-            bool retVal = PolygonStringValidator.IsValid(_goodPosListPolygon);
+            bool retVal = _polygonValidator.Validate(_goodPosListPolygon);
 
             // Assert
             Assert.IsTrue(retVal);
@@ -68,7 +71,7 @@ namespace ValidatorTests
         {
             // Arrange
             // Act
-            bool retVal = PolygonStringValidator.IsValid(_goodCoordinate1, ListType.Coordinate);
+            bool retVal = _polygonValidator.Validate(_goodCoordinate1, ListType.Coordinate);
 
             // Assert
             Assert.IsTrue(retVal);
@@ -79,7 +82,7 @@ namespace ValidatorTests
         {
             // Arrange
             // Act
-            bool retVal = PolygonStringValidator.IsValid(_badCoordinate1, ListType.Coordinate);
+            bool retVal = _polygonValidator.Validate(_badCoordinate1, ListType.Coordinate);
 
             // Assert
             Assert.IsFalse(retVal);
@@ -91,7 +94,7 @@ namespace ValidatorTests
         {
             // Arrange
             // Act
-            bool retVal = PolygonStringValidator.IsValid(_goodPoslitPolygon2);
+            bool retVal = _polygonValidator.Validate(_goodPoslitPolygon2);
 
             // Assert
             Assert.IsTrue(retVal);
@@ -102,7 +105,7 @@ namespace ValidatorTests
         {
             // Arrange
             // Act
-            bool retVal = PolygonStringValidator.IsValid(_badPosListPolygon2);
+            bool retVal = _polygonValidator.Validate(_badPosListPolygon2);
 
             // Assert
             Assert.IsFalse(retVal);
