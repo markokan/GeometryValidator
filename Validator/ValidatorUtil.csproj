@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ListType.cs" />
+    <Compile Include="PDA\InvalidPdaException.cs" />
     <Compile Include="PDA\Pda.cs" />
     <Compile Include="PDA\State.cs" />
     <Compile Include="PDA\Transition.cs" />

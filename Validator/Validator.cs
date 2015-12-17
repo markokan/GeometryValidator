@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using ValidatorUtil.PDA;
 
 namespace ValidatorUtil
 {
+    /// <summary>
+    /// Validates Polygon strings. Supported Coordinate and PosList.
+    /// Check is string correct format and polygon is closed.
+    /// </summary>
     public static class PolygonStringValidator
     {
         public static bool IsValid(string input, ListType typeOfList = ListType.PosList)
@@ -24,7 +24,7 @@ namespace ValidatorUtil
                    Transitions = new List<Transition>
                    {
                        new Transition(new []{ '0', '1','2','3','4','5','6','7','8','9'}, Transition.EpsilonChar, Transition.EpsilonChar, 0),
-                       new Transition('.', 'A', Transition.EpsilonChar, 1)
+                       new Transition('.', Transition.EpsilonChar, 'A', 1)
                    }
                },
                new State(1)
@@ -32,18 +32,19 @@ namespace ValidatorUtil
                    Transitions = new List<Transition>
                    {
                      new Transition(new []{ '0', '1','2','3','4','5','6','7','8','9'}, Transition.EpsilonChar, Transition.EpsilonChar, 1),
-                     new Transition(compareChar, 'B', 'A', 2)
+                     new Transition(compareChar, Transition.EpsilonChar, 'B', 2),
+                     new Transition('\t', Transition.EpsilonChar, 'B', 2),
+                     new Transition('\n', Transition.EpsilonChar, 'B', 2),
                    }
                },
                new State(2)
                {
                     Transitions = new List<Transition>
                     {
-                        new Transition(' ', Transition.EpsilonChar, Transition.EpsilonChar, 2),
                         new Transition('\t', Transition.EpsilonChar, Transition.EpsilonChar, 2),
                         new Transition('\n', Transition.EpsilonChar, Transition.EpsilonChar, 2),
                         new Transition(new []{ '0', '1','2','3','4','5','6','7','8','9'}, Transition.EpsilonChar, Transition.EpsilonChar, 2),
-                        new Transition('.', Transition.PopChar, 'B', 3),
+                        new Transition('.', 'B', Transition.EpsilonChar, 3),
                     }
                },
                new State(3)
@@ -51,7 +52,8 @@ namespace ValidatorUtil
                     Transitions = new List<Transition>
                     {
                         new Transition(new []{ '0', '1','2','3','4','5','6','7','8','9'}, Transition.EpsilonChar, Transition.EpsilonChar, 3),
-                        new Transition(compareChar, Transition.PopChar, 'A', 4)
+                        new Transition(compareChar, 'A', Transition.EpsilonChar, 4),
+                        new Transition(Transition.EpsilonChar, 'A', Transition.EpsilonChar, 4)
                     }
                },
                new State(4, false, true)
@@ -66,7 +68,7 @@ namespace ValidatorUtil
                }
             };
 
-            retval = pdaCheckPolygon.Run(input);
+            retval = pdaCheckPolygon.IsAcceptable(input);
 
             // Tarkasta onko sama vika kuin eka (PDA)
             if (retval)

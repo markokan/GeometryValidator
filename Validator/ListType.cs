@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace ValidatorUtil
 {
-
+    /// <summary>
+    /// Gml linearstring listtype
+    /// </summary>
     public enum ListType
     {
         PosList = 0,
