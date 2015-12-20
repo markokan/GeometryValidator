@@ -94,7 +94,7 @@ namespace ValidatorUtil.PDA
             return retVal;
         }
 
-        private bool IsAccepted(State currentState, char[] input, List<char> stack = null, int position = 0)
+        private bool IsAccepted(State currentState, char[] input, List<char> stack = null, int position = 0, int child = 0)
         {
             if (stack == null) stack = new List<char>();
 
@@ -141,14 +141,17 @@ namespace ValidatorUtil.PDA
                         {
                             SeekStack(transition, ref stack);
 
-                            Debug.WriteLine("InputChar={0}, State={1}, Stack={2}", input[position],
-                                currentState != null ? currentState.Id : -1, stack != null ? stack.GetStack() : "");
+                            Debug.WriteLine("InputChar={0}, State={1}, Stack={2}, {3}", input[position],
+                                currentState != null ? currentState.Id : -1, stack != null ? stack.GetStack() : "", ">".Generate(child));
 
                             position++;
 
                             List<char> copyOfList = new List<char>(stack);
+                            child++;
+
                             isAccept = IsAccepted(state, input, copyOfList, position);
 
+                            child--;
                             if (isAccept)
                             {
                                 return true;

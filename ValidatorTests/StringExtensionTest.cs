@@ -27,14 +27,20 @@ namespace ValidatorTests
         {
             // Arrange
             string a = "12345";
-            string b = "54321";
 
-            //Act
-            string c = a.Reverse();
+            //Act // Assert
+            Assert.IsTrue(string.Compare(a.Reverse().Reverse(), a) == 0);
+        }
 
-            // Assert
-            Assert.IsTrue(b.Length == c.Length);
-            Assert.IsTrue(string.Compare(b, c) == 0);
+
+        [TestMethod]
+        public void Reverse_Empty_Success()
+        {
+            // Arrange
+            string a = "";
+
+            //Act // Assert
+            Assert.IsTrue(a.Reverse() == string.Empty);
         }
     }
 }

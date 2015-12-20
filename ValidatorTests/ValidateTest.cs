@@ -122,17 +122,129 @@ namespace ValidatorTests
             var lineValidator = new LineValidator();
 
             // Act
-            bool retVal = lineValidator.Validate("552195.58089905 6932799.75180975 552195.128651859 6932799.98832659");
+            bool retVal = lineValidator.Validate("100,200 150,300", ListType.Coordinate);
 
             // Assert
             Assert.IsTrue(retVal);
         }
 
         [TestMethod]
-        public void Validate_Point_Success()
+        public void Validate_Line_Reject()
         {
+            // Arrange
+            var lineValidator = new LineValidator();
 
+            // Act
+            bool retVal = lineValidator.Validate("100,,200 150,300", ListType.Coordinate);
+
+            // Assert
+            Assert.IsFalse(retVal);
         }
 
+        [TestMethod]
+        public void Validate_Point_Coordinate_Success()
+        {
+            // Arrange
+            var pointValidator = new PointValidator();
+
+            // Act
+            bool retVal = pointValidator.Validate("100.0,200.0", ListType.Coordinate);
+
+            // Assert
+            Assert.IsTrue(retVal);
+        }
+
+
+        [TestMethod]
+        public void Validate_PointNoDot_Coordinate_Success()
+        {
+            // Arrange
+            var pointValidator = new PointValidator();
+
+            // Act
+            bool retVal = pointValidator.Validate("100,200", ListType.Coordinate);
+
+            // Assert
+            Assert.IsTrue(retVal);
+        }
+
+        [TestMethod]
+        public void Validate_Point_PosList_Success()
+        {
+            // Arrange
+            var pointValidator = new PointValidator();
+
+            // Act
+            bool retVal = pointValidator.Validate("100.0 200.0");
+
+            // Assert
+            Assert.IsTrue(retVal);
+        }
+
+
+        [TestMethod]
+        public void Validate_PointNoDot_PosList_Success()
+        {
+            // Arrange
+            var pointValidator = new PointValidator();
+
+            // Act
+            bool retVal = pointValidator.Validate("100 200");
+
+            // Assert
+            Assert.IsTrue(retVal);
+        }
+
+        [TestMethod]
+        public void Validate_PointNoDot_PosList_Failed()
+        {
+            // Arrange
+            var pointValidator = new PointValidator();
+
+            // Act
+            bool retVal = pointValidator.Validate("100 200 3000");
+
+            // Assert
+            Assert.IsFalse(retVal);
+        }
+
+        [TestMethod]
+        public void Validate_PointNoDot_Coordinate_Failed()
+        {
+            // Arrange
+            var pointValidator = new PointValidator();
+
+            // Act
+            bool retVal = pointValidator.Validate("100,200 3000", ListType.Coordinate);
+
+            // Assert
+            Assert.IsFalse(retVal);
+        }
+
+        [TestMethod]
+        public void Validate_Point_Coordinate_Failed()
+        {
+            // Arrange
+            var pointValidator = new PointValidator();
+
+            // Act
+            bool retVal = pointValidator.Validate("100,,200", ListType.Coordinate);
+
+            // Assert
+            Assert.IsFalse(retVal);
+        }
+
+        [TestMethod]
+        public void Validate_Point_PosList_Failed()
+        {
+            // Arrange
+            var pointValidator = new PointValidator();
+
+            // Act
+            bool retVal = pointValidator.Validate("100  200 1");
+
+            // Assert
+            Assert.IsFalse(retVal);
+        }
     }
 }

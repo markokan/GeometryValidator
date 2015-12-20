@@ -18,5 +18,14 @@ namespace ValidatorUtil
 
             return str.ToString();
         }
+
+        public static string Generate(this string msg, int amount)
+        {
+            StringBuilder ge = new StringBuilder();
+            for (int i = 0; i <= amount; i++)
+                ge.Append(msg);
+
+            return ge.ToString();
+        }
     }
 }

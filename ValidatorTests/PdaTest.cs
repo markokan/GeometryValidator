@@ -128,7 +128,7 @@ namespace ValidatorTests
         }
 
         [TestMethod]
-        public void Nfa_Success()
+        public void NonDetermiscinPda_Success()
         {
             // Just testing normal non-determic pda is possible -> If nfa type of pda is possible
             // Nfa is possible
