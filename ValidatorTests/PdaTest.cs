@@ -126,5 +126,70 @@ namespace ValidatorTests
             // Assert
             Assert.IsFalse(retval);
         }
+
+        [TestMethod]
+        public void Nfa_Success()
+        {
+            // Just testing normal non-determic pda is possible -> If nfa type of pda is possible
+            // Nfa is possible
+
+            // Arrange
+            var nfaPda = new Pda();
+            nfaPda.States = new List<State>
+            {
+                new State(1, true)
+                {
+                    Transitions = new List<Transition>
+                    {
+                        new Transition('0', Transition.EpsilonChar, Transition.EpsilonChar, 2),
+                        new Transition('1', Transition.EpsilonChar, Transition.EpsilonChar, 3),
+                        new Transition(new char[] {'0','1' }, Transition.EpsilonChar, Transition.EpsilonChar, 1)
+                    }
+                },
+                new State(2)
+                {
+                    Transitions = new List<Transition>
+                    {
+                      new Transition('0', Transition.EpsilonChar, Transition.EpsilonChar, 4)
+                    }
+                },
+                new State(3)
+                {
+                    Transitions = new List<Transition>
+                    {
+                      new Transition('1', Transition.EpsilonChar, Transition.EpsilonChar, 5)
+                    }
+                },
+                new State(4)
+                {
+                    Transitions = new List<Transition>
+                    {
+                      new Transition('0', Transition.EpsilonChar, Transition.EpsilonChar, 6)
+                    }
+                },
+                new State(5)
+                {
+                    Transitions = new List<Transition>
+                    {
+                      new Transition('1', Transition.EpsilonChar, Transition.EpsilonChar, 6)
+                    }
+                },
+                new State(6, false, true)
+                {
+                    Transitions = new List<Transition>
+                    {
+                       new Transition('1', Transition.EpsilonChar, Transition.EpsilonChar, 6),
+                       new Transition('0', Transition.EpsilonChar, Transition.EpsilonChar, 6)
+                    }
+                }
+
+            };
+
+            // Act
+            var retval = nfaPda.IsAcceptable("0110001");
+
+            // Assert
+            Assert.IsTrue(retval);
+        }
     }
 }

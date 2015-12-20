@@ -131,12 +131,21 @@ namespace ValidatorUtil.PDA
 
                 if (possibleTransitions.Count > 1)
                 {
+                    int positionSave = position;
+
                     foreach (var transition in possibleTransitions)
                     {
                         bool isAccept = false;
                         var state = States.FirstOrDefault(c => c.Id == transition.StateIdOut);
                         if (state != null)
                         {
+                            SeekStack(transition, ref stack);
+
+                            Debug.WriteLine("InputChar={0}, State={1}, Stack={2}", input[position],
+                                currentState != null ? currentState.Id : -1, stack != null ? stack.GetStack() : "");
+
+                            position++;
+
                             List<char> copyOfList = new List<char>(stack);
                             isAccept = IsAccepted(state, input, copyOfList, position);
 
@@ -144,9 +153,12 @@ namespace ValidatorUtil.PDA
                             {
                                 return true;
                             }
+
+                            position = positionSave;
                         }
                     }
-                   
+
+                    
                 }
                 else
                 {

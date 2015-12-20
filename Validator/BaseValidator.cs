@@ -10,8 +10,8 @@ namespace ValidatorUtil
             char compareChar = typeOfList == ListType.PosList ? ' ' : ',';
 
             // Tarkasta onko oikea määrä pareja ja sisältö oikein (PDA)
-            var pdaCheckPolygon = new Pda();
-            pdaCheckPolygon.States = new List<State>
+            var checkGeometryTuples = new Pda();
+            checkGeometryTuples.States = new List<State>
             {
                new State(0, true)
                {
@@ -62,7 +62,7 @@ namespace ValidatorUtil
                }
             };
 
-            return pdaCheckPolygon.IsAcceptable(input);
+            return checkGeometryTuples.IsAcceptable(input);
         }
 
         public abstract bool Validate(string input, ListType typeOfList = ListType.PosList);

@@ -31,11 +31,11 @@ namespace ValidatorUtil
             return builder.ToString();
         }
 
-        public static string Reverse(this string s)
+        public static string Reverse(this string str)
         {
-            char[] charArray = s.ToCharArray();
-            Array.Reverse(charArray);
-            return new string(charArray);
+            char[] charMarks = str.ToCharArray();
+            Array.Reverse(charMarks);
+            return new string(charMarks);
         }
     }
 }
