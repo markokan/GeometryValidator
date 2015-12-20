@@ -54,6 +54,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="PdaTest.cs" />
+    <Compile Include="StringExtensionTest.cs" />
     <Compile Include="ValidateTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

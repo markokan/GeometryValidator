@@ -11,6 +11,7 @@ namespace ValidatorUtil.PDA
     /// Can be used to do different kinds push down automatas.
     /// Use States to generate states with transitions. 
     /// This state machine can handle epsilon transitions.
+    /// This Acceptes only if both stack is empty and state is accepted!
     /// </summary>
     public class Pda
     {
@@ -18,17 +19,20 @@ namespace ValidatorUtil.PDA
         /// Current input string
         /// </summary>
         public char[] Input { get; private set; }
-    
+
         /// <summary>
         /// Machine states
         /// </summary>
         public IEnumerable<State> States { get; set; }
 
+        public Pda()
+        { }
+
         /// <summary>
         /// Check PDA has enough information to run.
         /// </summary>
         /// <returns></returns>
-        private StringBuilder CheckPda()
+        private StringBuilder Validate()
         {
             StringBuilder errors = new StringBuilder();
 
@@ -57,7 +61,7 @@ namespace ValidatorUtil.PDA
         {
             bool retVal = false;
 
-            StringBuilder errors = CheckPda();
+            StringBuilder errors = Validate();
             if (!string.IsNullOrEmpty(errors.ToString()))
             {
                 throw new InvalidPdaException(errors.ToString());
@@ -76,23 +80,32 @@ namespace ValidatorUtil.PDA
 
                 Input = input.ToCharArray();
 
-                retVal = IsAccepted(runningState, Input);
+                try
+                {
+                    retVal = IsAccepted(runningState, Input);
+                }
+                catch (InvalidPdaException f)
+                {
+                    Debug.WriteLine(f.ToString());
+                    retVal = false;
+                }
             }
 
             return retVal;
         }
 
-        private bool IsAccepted(State currentState, char[] input)
+        private bool IsAccepted(State currentState, char[] input, List<char> stack = null, int position = 0)
         {
-            int position = 0;
-            StringBuilder stack = new StringBuilder();
+            if (stack == null) stack = new List<char>();
+
             char currentTopOfStack;
 
             while (input.Length > position)
             {
-                currentTopOfStack = stack.Length == 0 ? Transition.EpsilonChar : stack[stack.Length - 1];
+                currentTopOfStack = stack.Count == 0 ? Transition.EpsilonChar : stack[stack.Count - 1];
 
                 var possibleTransitions = currentState.GetPossibleTransitions(input[position], currentTopOfStack);
+
                 if (possibleTransitions == null)
                 {
                     if (currentState.EpsilonTransition != null)
@@ -107,7 +120,7 @@ namespace ValidatorUtil.PDA
                         }
                         else
                         {
-                            return currentState.IsAccept;
+                            return currentState.IsAccept && stack.Count == 0;
                         }
                     }
                     else
@@ -116,21 +129,43 @@ namespace ValidatorUtil.PDA
                     }
                 }
 
-                var currentTransition = possibleTransitions.FirstOrDefault();
-                // käytä tilaa
-                SeekStack(currentTransition, ref stack);
+                if (possibleTransitions.Count > 1)
+                {
+                    foreach (var transition in possibleTransitions)
+                    {
+                        bool isAccept = false;
+                        var state = States.FirstOrDefault(c => c.Id == transition.StateIdOut);
+                        if (state != null)
+                        {
+                            List<char> copyOfList = new List<char>(stack);
+                            isAccept = IsAccepted(state, input, copyOfList, position);
 
-                Debug.WriteLine("InputChar={0}, State={1}, Stack={2}", input[position],
-            currentState != null ? currentState.Id : -1, stack != null ? stack.ToString() : "");
+                            if (isAccept)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                   
+                }
+                else
+                {
+                    var currentTransition = possibleTransitions.FirstOrDefault();
+                    // Pop&Push
+                    SeekStack(currentTransition, ref stack);
 
-                position++;
+                    Debug.WriteLine("InputChar={0}, State={1}, Stack={2}", input[position],
+                        currentState != null ? currentState.Id : -1, stack != null ? stack.GetStack() : "");
 
-                // vaihda tilaa jos pitää
-                if (currentTransition.StateIdOut != currentState.Id)
-                    currentState = States.FirstOrDefault(c => c.Id == currentTransition.StateIdOut);
+                    position++;
+
+                    // Change state if needed
+                    if (currentTransition.StateIdOut != currentState.Id)
+                        currentState = States.FirstOrDefault(c => c.Id == currentTransition.StateIdOut);
+                }
             }
 
-            // Jos ei olla hyväksyvässä tilaas tarkista vielä epsilon siirtymä
+            // Not accepted state (check is there epsilon movement)
             if (!currentState.IsAccept && currentState.EpsilonTransition != null)
             {
                 if (SeekStack(currentState.EpsilonTransition, ref stack))
@@ -139,29 +174,32 @@ namespace ValidatorUtil.PDA
                 }
             }
 
-            return currentState.IsAccept;
+            return currentState.IsAccept &&  stack.Count == 0;
         }
 
-        private bool SeekStack(Transition currentTransition, ref StringBuilder stack)
+        private bool SeekStack(Transition currentTransition, ref List<char> stack)
         {
-            if (currentTransition.PopCharacter != Transition.EpsilonChar)
+            if (currentTransition.PopCharacter != Transition.EpsilonChar && currentTransition.PushCharacter == Transition.EpsilonChar)
             {
                 // Pop
-                if (stack.Length > 0 && stack[stack.Length - 1] == currentTransition.PopCharacter)
+                if (stack.Count > 0 && stack[stack.Count - 1] == currentTransition.PopCharacter)
                 {
-                    stack.Remove(stack.Length - 1, 1);
+                    Debug.WriteLine("[POP] stack {0} -> {1}", stack.GetStack(), currentTransition.PopCharacter);
+                    stack.RemoveAt(stack.Count - 1);
+
                 }
                 else
                 {
                     // Fail fast
-                    throw new ApplicationException("Stack doesn't contain value. Something totally messed up!");
+                    throw new InvalidPdaException("Stack doesn't contain value. Something totally messed up!");
                 }
             }
 
-            if (currentTransition.PushCharacter != Transition.EpsilonChar)
+            if (currentTransition.PushCharacter.HasValue && currentTransition.PushCharacter.Value != Transition.EpsilonChar)
             {
                 // Push
-                stack.Append(currentTransition.PushCharacter);
+                Debug.WriteLine("[PUSH] stack {0} -> {1}", stack.GetStack(), currentTransition.PushCharacter.Value);
+                stack.Add(currentTransition.PushCharacter.Value);
             }
 
             return true;

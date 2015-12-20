@@ -34,7 +34,8 @@ namespace ValidatorUtil.PDA
         /// <summary>
         /// Transition push character
         /// </summary>
-        public char PushCharacter { get; set; }
+        public char? PushCharacter { get; set; }
+
 
         /// <summary>
         /// Possible state change id

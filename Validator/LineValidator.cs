@@ -15,12 +15,6 @@ namespace ValidatorUtil
         {
             bool retVal = IsValid(input, typeOfList);
 
-            // sama piste kahdesti?
-            if (retVal)
-            {
-
-            }
-
             return retVal;
         }
     }

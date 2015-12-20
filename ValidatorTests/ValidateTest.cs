@@ -53,6 +53,9 @@ namespace ValidatorTests
 
             _goodCoordinate1 = "0.0,0.0 100.0,0.0 100.0,100.0 0.0,100.0 0.0,0.0";
             _badCoordinate1 = "0.0,0.0 100.0,0.0 100,0,100.0 0.0,100.0 0.0,0.0";
+
+            
+
         }
 
         [TestMethod]
@@ -115,7 +118,14 @@ namespace ValidatorTests
         [TestMethod]
         public void Validate_Line_Success()
         {
+            // Arrange
+            var lineValidator = new LineValidator();
 
+            // Act
+            bool retVal = lineValidator.Validate("552195.58089905 6932799.75180975 552195.128651859 6932799.98832659");
+
+            // Assert
+            Assert.IsTrue(retVal);
         }
 
         [TestMethod]

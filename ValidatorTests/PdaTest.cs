@@ -8,12 +8,15 @@ namespace ValidatorTests
     [TestClass]
     public class PdaTest
     {
-        [TestMethod]
-        public void TrySimpleZeroOne_Accept() //0^n1^n
+        private Pda _zeroOneCountEq;
+        private Pda _bracketPda;
+
+        [TestInitialize]
+        public void InitTest()
         {
-            // Arrange
-            var zeroOnePda = new Pda();
-            zeroOnePda.States = new List<State>
+            //0^n1^n (NPDA)
+            _zeroOneCountEq = new Pda();
+            _zeroOneCountEq.States = new List<State>
             {
                 new State(0, true)
                 {
@@ -41,8 +44,50 @@ namespace ValidatorTests
                 new State(3,false, true)
             };
 
+            // Start same number and ends same number also eq amount 0 and 1. (DPDA)
+            _bracketPda = new Pda();
+            _bracketPda.States = new List<State>
+            {
+                 new State(0, true)
+                {
+                   Transitions = new List<Transition>
+                   {
+                       new Transition(Transition.EpsilonChar, Transition.EpsilonChar,'$', 1)
+                   }
+                },
+                new State(1)
+                {
+                   Transitions = new List<Transition>
+                   {
+                       new Transition('(', '$', '1', 2)
+                   }
+                },
+                new State(2)
+                {
+                    Transitions = new List<Transition>
+                    {
+                        new Transition('(', '1','1', 2),
+                        new Transition(')', '1', Transition.EpsilonChar, 3)
+                    }
+                },
+                new State(3)
+                {
+                    Transitions = new List<Transition>
+                    {
+                        new Transition(')', '1', Transition.EpsilonChar, 3),
+                        new Transition(Transition.EpsilonChar, '$', Transition.EpsilonChar ,4)
+                    }
+                },
+                new  State(4, false, true)
+            };
+        }
+
+        [TestMethod]
+        public void TrySimpleZeroOne_Accept() //0^n1^n
+        {
+            // Arrange
             // Act
-            var retval = zeroOnePda.IsAcceptable("000111");
+            var retval = _zeroOneCountEq.IsAcceptable("000111");
 
             // Assert
             Assert.IsTrue(retval);
@@ -52,37 +97,31 @@ namespace ValidatorTests
         public void TrySimpleZeroOne_Reject() //0^n1^n
         {
             // Arrange
-            var zeroOnePda = new Pda();
-            zeroOnePda.States = new List<State>
-            {
-                new State(0, true)
-                {
-                   Transitions = new List<Transition>
-                   {
-                       new Transition(Transition.EpsilonChar, Transition.EpsilonChar, '$', 1)
-                   }
-                },
-                new State(1)
-                {
-                    Transitions = new List<Transition>
-                    {
-                        new Transition(Transition.EpsilonChar, Transition.EpsilonChar, Transition.EpsilonChar, 2),
-                        new Transition('0', Transition.EpsilonChar, '0', 1)
-                    }
-                },
-                new State(2)
-                {
-                    Transitions = new List<Transition>
-                    {
-                        new Transition('1', '0', Transition.EpsilonChar, 2),
-                        new Transition(Transition.EpsilonChar, '$', Transition.EpsilonChar, 3)
-                    }
-                },
-                new State(3,false, true)
-            };
-
             // Act
-            var retval = zeroOnePda.IsAcceptable("00111");
+            var retval = _zeroOneCountEq.IsAcceptable("00111");
+
+            // Assert
+            Assert.IsFalse(retval);
+        }
+
+        [TestMethod]
+        public void Bracket_Success()
+        {
+            //Arrange
+            //Act
+            var retval = _bracketPda.IsAcceptable("(())");
+
+            // Assert
+            Assert.IsTrue(retval);
+        }
+
+
+        [TestMethod]
+        public void Bracket_Failed()
+        {
+            //Arrange
+            //Act
+            var retval = _bracketPda.IsAcceptable("(()");
 
             // Assert
             Assert.IsFalse(retval);
