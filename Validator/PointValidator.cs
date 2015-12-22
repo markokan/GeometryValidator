@@ -16,24 +16,14 @@ namespace ValidatorUtil
     /// </summary>
     public class PointValidator : BaseValidator
     {
+        private Pda _pointPda;
 
-        public PointValidator() : base()
-        { }
-
-        /// <summary>
-        /// Validates point.
-        /// </summary>
-        /// <param name="input"></param>
-        /// <param name="typeOfList"></param>
-        /// <returns></returns>
-        public override bool Validate(string input, ListType typeOfList = ListType.PosList)
+        public PointValidator(ListType typeOfList = ListType.PosList) : base(typeOfList)
         {
-            bool retVal = false;
-
             char symbol = typeOfList == ListType.PosList ? ' ' : ',';
 
-            var pointPda = new Pda();
-            pointPda.States = new List<State>
+            _pointPda = new Pda();
+            _pointPda.States = new List<State>
             {
                 new State(1, true)
                 {
@@ -58,7 +48,7 @@ namespace ValidatorUtil
                     Transitions = new List<Transition>
                     {
                         new Transition(new []{'\t', '\n', '0','1','2','3','4','5','6','7','8','9'}, Transition.EpsilonChar, Transition.EpsilonChar, 3),
-                        new Transition(symbol, 'A', Transition.EpsilonChar , 2)
+                        new Transition(symbol, 'A', Transition.EpsilonChar, 2)
                     }
                 },
                 new State(4)
@@ -71,8 +61,18 @@ namespace ValidatorUtil
                 },
                 new State(5)
             };
+        }
 
-            retVal = pointPda.IsAcceptable(input);
+        /// <summary>
+        /// Validates point.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public override bool Validate(string input)
+        {
+            bool retVal = false;
+
+            retVal = _pointPda.IsAcceptable(input);
 
             return retVal;
         }

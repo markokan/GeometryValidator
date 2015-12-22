@@ -5,13 +5,19 @@ namespace ValidatorUtil
 {
     public abstract class BaseValidator
     {
-        protected bool IsValid(string input, ListType typeOfList = ListType.PosList)
+        private Pda _checkGeometryTuples;
+        public ListType ListType
         {
+            get; private set;
+        }
+
+        public BaseValidator(ListType typeOfList = ListType.PosList)
+        {
+            ListType = typeOfList;
             char compareChar = typeOfList == ListType.PosList ? ' ' : ',';
 
-            // Tarkasta onko oikea määrä pareja ja sisältö oikein (PDA)
-            var checkGeometryTuples = new Pda();
-            checkGeometryTuples.States = new List<State>
+            _checkGeometryTuples = new Pda();
+            _checkGeometryTuples.States = new List<State>
             {
                new State(0, true)
                {
@@ -61,10 +67,13 @@ namespace ValidatorUtil
                     }
                }
             };
-
-            return checkGeometryTuples.IsAcceptable(input);
         }
 
-        public abstract bool Validate(string input, ListType typeOfList = ListType.PosList);
+        protected bool IsValid(string input)
+        {
+            return _checkGeometryTuples.IsAcceptable(input);
+        }
+
+        public abstract bool Validate(string input);
     }
 }

@@ -42,10 +42,15 @@ namespace ValidatorUtil.PDA
             }
             else
             {
-                var hasStart = States.FirstOrDefault(c => c.IsStart);
-                if (hasStart == null)
+                var hasStart = States.Where(c => c.IsStart).ToList();
+                if (hasStart == null || hasStart.Count < 1)
                 {
                     errors.Append("Missing start State!\n");
+                }
+                
+                if (hasStart.Count > 1)
+                {
+                    errors.AppendFormat("Support only one start state. Now there is {0} start states.", hasStart.Count);
                 }
             }
 
@@ -94,20 +99,33 @@ namespace ValidatorUtil.PDA
             return retVal;
         }
 
+        /// <summary>
+        /// Check is PDA accept or reject states. This is motor of push down automata.
+        /// </summary>
+        /// <param name="currentState"></param>
+        /// <param name="input"></param>
+        /// <param name="stack"></param>
+        /// <param name="position"></param>
+        /// <param name="child"></param>
+        /// <returns></returns>
         private bool IsAccepted(State currentState, char[] input, List<char> stack = null, int position = 0, int child = 0)
         {
             if (stack == null) stack = new List<char>();
 
             char currentTopOfStack;
 
+            // Loop input
             while (input.Length > position)
             {
                 currentTopOfStack = stack.Count == 0 ? Transition.EpsilonChar : stack[stack.Count - 1];
 
+                // Get possible transitions
                 var possibleTransitions = currentState.GetPossibleTransitions(input[position], currentTopOfStack);
 
+                // None 
                 if (possibleTransitions == null)
                 {
+                    // Is there epsilon transition in state?
                     if (currentState.EpsilonTransition != null)
                     {
                         if (currentState.EpsilonTransition.IsIn(Transition.EpsilonChar, currentTopOfStack).HasValue)
@@ -129,6 +147,7 @@ namespace ValidatorUtil.PDA
                     }
                 }
 
+                // If there is more than one check all paths.
                 if (possibleTransitions.Count > 1)
                 {
                     int positionSave = position;
@@ -142,7 +161,7 @@ namespace ValidatorUtil.PDA
                             SeekStack(transition, ref stack);
 
                             Debug.WriteLine("InputChar={0}, State={1}, Stack={2}, {3}", input[position],
-                                currentState != null ? currentState.Id : -1, stack != null ? stack.GetStack() : "", ">".Generate(child));
+                                currentState != null ? currentState.Id : -1, stack != null ? stack.GetStack() : "", "-".Generate(child));
 
                             position++;
 
@@ -160,8 +179,6 @@ namespace ValidatorUtil.PDA
                             position = positionSave;
                         }
                     }
-
-                    
                 }
                 else
                 {
